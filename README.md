@@ -14,9 +14,10 @@ python[3] CorruptionCheck.py -d false -p '/mnt/media' -f '/usr/bin/ffprobe'
 
 The variables are honored to configure your instance:
 
-* `-d, --dry-run`	=	Disk full threshold (Default 700 (e.g. 70%))
-* `-p,--path`	=	Period in seconds between disk threshold checks. The default interval is 60 seconds. Higher quality source media and a smaller disk size require more frequent threshold checks A higher disk threshold (speficied by the user) will also require more frequent checks;
-* `-f,--ffprobe-path`	=	Path to the temporary working directory used by the Plex New Transcoder. The transcode_path can be modified from the Plex web through Settings -> Server -> General -> Advanced;
+* `-d, --dry-run`	=	Dry run, print only - no actual deletion
+* `-p,--path`	=	Path to scan for corrupt files.
+* `-f,--ffprobe-path`	=	Path to the ffprobe binary (or avprobe)
+* `-s, --silent`	=	Only prints warnings & deletions, silent run
 
 ### Credits
 I'd like to thank https://github.com/clinton-hall/nzbToMedia/issues/534 for the full script.
