@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--dry-run', default=True, type=bool,help="Dry run, print only - no actual deletion")
 parser.add_argument('-p', '--path', default='.', type=str, help="Path to scan for corrupt files.")
 parser.add_argument('-f', '--ffprobe-path', default='/usr/bin/ffprobe', type=str,help="Path to the ffprobe binary")
+parser.add_argument('-s', '--silent', default=False, type=str,help="Only prints warnings & deletions, silent run")
 args = parser.parse_args()
 
 
@@ -39,8 +40,8 @@ def isVideoGood(videofile):
     disable = False
     if fileExt not in ['.mkv','.avi','.divx','.xvid','.mov','.wmv','.mp4','.mpg','.mpeg','.vob','.iso','.ts'] or not FFPROBE:
         return True
-
-    print("[INFO] Checking [{0}] for corruption, please stand by ...".format(fileNameExt))
+    if not args.silent:
+        print("[INFO] Checking [{0}] for corruption, please stand by ...".format(fileNameExt))
     video_details, result = getVideoDetails(videofile)
 
     if result != 0:
@@ -53,7 +54,8 @@ def isVideoGood(videofile):
         videoStreams = [item for item in video_details["streams"] if item["codec_type"] == "video"]
         audioStreams = [item for item in video_details["streams"] if item["codec_type"] == "audio"]
         if len(videoStreams) > 0 and len(audioStreams) > 0:
-            print( "[INFO] SUCCESS: [%s] has no corruption." % (fileNameExt))
+            if not args.silent:
+                print( "[INFO] SUCCESS: [%s] has no corruption." % (fileNameExt))
             return True
         else:
             print ("[INFO] FAILED: [%s] has %s video streams and %s audio streams. Assume corruption." % (fileNameExt, str(len(videoStreams)), str(len(audioStreams))))
@@ -88,7 +90,6 @@ def getVideoDetails(videofile):
 
 
 def corruption_check():
-    corrupt = False
     num_files = 0
     good_files = 0
     for dir, dirnames, filenames in os.walk(os.environ['NZBPP_DIRECTORY']):
@@ -106,12 +107,7 @@ def corruption_check():
                     xxp=dir
                     os.rmdir(dir)
                 print("[INFO] Removing {0} at {1}".format(mode,xxp))
-    if num_files > 0 and good_files < num_files:
-        print ("[INFO] Corrupt video file found.")
-        corrupt = True
-    return corrupt
 
 if __name__ == "__main__":
-    corrupt = corruption_check()
-    if not corrupt:
-        sys.exit(1)
+    corruption_check()
+
